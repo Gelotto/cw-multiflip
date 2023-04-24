@@ -13,13 +13,14 @@ pub fn flip_coins(
   info: MessageInfo,
   flips: &Vec<Flip>,
 ) -> ContractResult<Response> {
-  let job_id = create_coin_flip_nois_job(deps.storage, flips)?;
+  let job = create_coin_flip_nois_job(deps.storage, flips)?;
+  // TODO: build token transfer msg to take payment
   Ok(
     Response::new()
       .add_attributes(vec![attr("action", "flip_coins")])
       .add_message(build_get_next_randomness_msg(
         deps.storage,
-        &job_id.clone(),
+        &job.job_id.clone(),
         &info.funds,
       )?),
   )
@@ -28,23 +29,20 @@ pub fn flip_coins(
 pub fn create_coin_flip_nois_job(
   storage: &mut dyn Storage,
   flips: &Vec<Flip>,
-) -> ContractResult<String> {
+) -> ContractResult<FlipNoisJob> {
   let job_id = get_next_job_id(storage)?;
-  let (n_flips, price_total) = compute_total_flip_count(storage, flips)?;
-  JOBS.save(
-    storage,
-    job_id.to_string(),
-    &FlipNoisJob {
-      job_id: job_id.clone(),
-      flips: flips.clone(),
-      price_total,
-      n_flips,
-    },
-  )?;
-  Ok(job_id)
+  let (n_flips, price_total) = compute_totals(storage, flips)?;
+  let job = FlipNoisJob {
+    job_id: job_id.clone(),
+    flips: flips.clone(),
+    price_total,
+    n_flips,
+  };
+  JOBS.save(storage, job_id.to_string(), &job)?;
+  Ok(job)
 }
 
-pub fn compute_total_flip_count(
+pub fn compute_totals(
   storage: &dyn Storage,
   flips: &Vec<Flip>,
 ) -> ContractResult<(u32, Uint128)> {

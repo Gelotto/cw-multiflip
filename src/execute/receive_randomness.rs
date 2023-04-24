@@ -17,7 +17,7 @@ pub fn receive_randomness(
   execute_flip_coins(deps, env, info, &callback.job_id, randomness)
 }
 
-pub fn execute_flip_coins(
+fn execute_flip_coins(
   deps: DepsMut,
   _env: Env,
   info: MessageInfo,
@@ -35,28 +35,30 @@ pub fn execute_flip_coins(
   // flip each coin however many times the user flipped it
   // and add win and loss to running totals
   for flip in job.flips.iter() {
-    if let Some(coin) = COINS.may_load(deps.storage, flip.i_coin)? {
-      let ints = &random_values[randomness_offset..randomness_offset + flip.n_flips as usize];
-      let n_wins = coin.flip(&ints);
-      let win = (coin.payout + coin.price) * Uint128::from(n_wins);
-      let loss = coin.price * Uint128::from(flip.n_flips - n_wins);
+    let coin = COINS.load(deps.storage, flip.i_coin)?;
+    let ints = &random_values[randomness_offset..randomness_offset + flip.n_flips as usize];
+    let n_wins = coin.flip(&ints);
+    let win = coin.payout * Uint128::from(n_wins);
+    let loss = coin.price * Uint128::from(flip.n_flips - n_wins);
 
-      total_win += win;
-      total_loss += loss;
-      randomness_offset += flip.n_flips as usize;
-    }
+    total_win += win;
+    total_loss += loss;
+    randomness_offset += flip.n_flips as usize;
   }
+
+  // we're done with the job, so delete it
+  JOBS.remove(deps.storage, job_id.clone());
 
   let house = House::new(&HOUSE_ADDR.load(deps.storage)?);
   let mut resp = Response::new().add_attributes(vec![attr("action", "receive_randomness")]);
 
   // send payment to or from the house
   if total_win > total_loss {
-    // send as payment from house to winner
+    // payment to winner
     let amount = total_win - total_loss;
     resp = resp.add_message(house.build_send_payment_msg(&info.sender, amount)?);
   } else if total_win < total_loss {
-    // send as payment from winner to house
+    // payment to house
     let amount = total_win - total_loss;
     resp = resp.add_message(house.build_receive_payment_msg(amount, &info.funds)?);
   }

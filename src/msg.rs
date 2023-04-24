@@ -1,20 +1,26 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{to_binary, Addr, Coin, Storage, WasmMsg};
-use nois::ProxyExecuteMsg;
+use nois::{NoisCallback, ProxyExecuteMsg};
 
-use crate::{error::ContractError, models::Flip, state::NOIS_PROXY_ADDR};
+use crate::{
+  error::ContractError,
+  models::{Flip, FlippableCoin},
+  state::NOIS_PROXY_ADDR,
+};
 
 pub type ContractResult<T> = Result<T, ContractError>;
 
 #[cw_serde]
 pub struct InstantiateMsg {
-  pub n_cols: u16,
   pub nois_proxy_addr: Addr,
+  pub coins: Vec<FlippableCoin>,
+  pub columns: u16,
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
   FlipCoins { flips: Vec<Flip> },
+  ReceiveRandomness { callback: NoisCallback },
 }
 
 #[cw_serde]

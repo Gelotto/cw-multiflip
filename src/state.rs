@@ -1,4 +1,4 @@
-use crate::models::FlipNoisJob;
+use crate::models::FlipCoinsNoisJob;
 use crate::msg::InstantiateMsg;
 use crate::{error::ContractError, models::FlippableCoin};
 use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, StdResult, Storage, Uint128};
@@ -8,7 +8,7 @@ use cw_storage_plus::{Item, Map};
 pub const OWNER: Item<Addr> = Item::new("owner");
 pub const COINS: Map<u16, FlippableCoin> = Map::new("coins");
 pub const COINS_LEN: Item<u16> = Item::new("coins_len");
-pub const JOBS: Map<String, FlipNoisJob> = Map::new("jobs");
+pub const JOBS: Map<String, FlipCoinsNoisJob> = Map::new("jobs");
 pub const NEXT_JOB_ID: Item<Uint128> = Item::new("next_job_id");
 pub const NOIS_PROXY_ADDR: Item<Addr> = Item::new("nois_proxy_addr");
 pub const HOUSE_ADDR: Item<Addr> = Item::new("house_addr");

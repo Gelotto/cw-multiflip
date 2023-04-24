@@ -15,11 +15,11 @@ pub struct Flip {
 }
 
 #[cw_serde]
-pub struct FlipNoisJob {
+pub struct FlipCoinsNoisJob {
   pub job_id: String,
   pub flips: Vec<Flip>,
   pub n_flips: u32,
-  pub price_total: Uint128,
+  pub total_price: Uint128,
 }
 
 #[cw_serde]

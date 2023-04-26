@@ -18,6 +18,12 @@ pub enum ContractError {
   #[error("ZeroFlipCount")]
   ZeroFlipCount {},
 
-  #[error("CoinIndexOutOfBounds")]
-  CoinIndexOutOfBounds {},
+  #[error("InvalidCoinOdds")]
+  InvalidCoinOdds {},
+
+  #[error("InvalidCoinPayout")]
+  InvalidCoinPayout {},
+
+  #[error("InvalidCoinPrice")]
+  InvalidCoinPrice {},
 }

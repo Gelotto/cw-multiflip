@@ -4,7 +4,7 @@ use nois::{NoisCallback, ProxyExecuteMsg};
 
 use crate::{
   error::ContractError,
-  models::{Flip, FlippableCoin},
+  models::{Flip, FlippableCoin, FlippableCoinView},
   state::NOIS_PROXY_ADDR,
 };
 
@@ -13,8 +13,8 @@ pub type ContractResult<T> = Result<T, ContractError>;
 #[cw_serde]
 pub struct InstantiateMsg {
   pub nois_proxy_addr: Addr,
+  pub house_addr: Addr,
   pub coins: Vec<FlippableCoin>,
-  pub columns: u16,
 }
 
 #[cw_serde]
@@ -37,6 +37,7 @@ pub struct MigrateMsg {}
 #[cw_serde]
 pub struct SelectResponse {
   pub owner: Option<Addr>,
+  pub coins: Option<Vec<FlippableCoinView>>,
 }
 
 pub fn build_get_next_randomness_msg(

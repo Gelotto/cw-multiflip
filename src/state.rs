@@ -1,5 +1,5 @@
 use crate::models::FlipCoinsNoisJob;
-use crate::msg::InstantiateMsg;
+use crate::msg::{ContractResult, InstantiateMsg};
 use crate::{error::ContractError, models::FlippableCoin};
 use cosmwasm_std::{Addr, DepsMut, Env, MessageInfo, StdResult, Storage, Uint128};
 use cw_lib::utils::validation::validate_addr;
@@ -23,6 +23,14 @@ pub fn initialize(
   OWNER.save(deps.storage, &info.sender)?;
   COINS_LEN.save(deps.storage, &0)?;
   NEXT_JOB_ID.save(deps.storage, &Uint128::zero())?;
+  HOUSE_ADDR.save(
+    deps.storage,
+    &validate_addr(
+      deps.api,
+      &msg.house_addr,
+      ContractError::InvalidNoisProxyAddress {},
+    )?,
+  )?;
   NOIS_PROXY_ADDR.save(
     deps.storage,
     &validate_addr(
@@ -31,6 +39,25 @@ pub fn initialize(
       ContractError::InvalidNoisProxyAddress {},
     )?,
   )?;
+
+  for (i, coin) in msg.coins.iter().enumerate() {
+    validate_coin(coin)?;
+    COINS.save(deps.storage, i as u16, &coin)?;
+  }
+
+  Ok(())
+}
+
+pub fn validate_coin(coin: &FlippableCoin) -> ContractResult<()> {
+  if coin.odds < 1 || coin.odds > 1000 {
+    return Err(ContractError::InvalidCoinOdds {});
+  }
+  if coin.payout.is_zero() {
+    return Err(ContractError::InvalidCoinPayout {});
+  }
+  if coin.price.is_zero() {
+    return Err(ContractError::InvalidCoinPrice {});
+  }
   Ok(())
 }
 

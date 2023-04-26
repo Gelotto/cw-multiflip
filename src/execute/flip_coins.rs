@@ -54,7 +54,7 @@ fn compute_totals(
       return Err(ContractError::ZeroFlipCount {});
     }
     if flip.i_coin >= n_coins {
-      return Err(ContractError::CoinIndexOutOfBounds {});
+      return Err(ContractError::InvalidCoinOdds {});
     }
     let coin = COINS.load(storage, flip.i_coin)?;
     n_flips_total += flip.n_flips as u32;

@@ -23,9 +23,11 @@ pub struct FlipCoinsNoisJob {
 }
 
 #[cw_serde]
-pub struct Grid {
-  pub n_rows: u16,
-  pub n_cols: u16,
+pub struct FlippableCoinView {
+  pub index: u16,
+  pub price: Uint128,
+  pub payout: Uint128,
+  pub odds: u16,
 }
 
 impl FlippableCoin {

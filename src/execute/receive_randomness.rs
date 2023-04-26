@@ -16,7 +16,7 @@ pub fn receive_randomness(
 ) -> ContractResult<Response> {
   let randomness = get_randomness(&callback)?;
   let job = JOBS.load(deps.storage, callback.job_id.clone())?;
-  let observations: Vec<u16> = ints_in_range(randomness, job.n_flips as usize, 0, 1000);
+  let observations: Vec<u16> = ints_in_range(randomness, job.n_flips as usize, 0, 999);
   let mut resp = Response::new().add_attributes(vec![attr("action", "receive_randomness")]);
   if let Some(house_msg) = execute_flip_coins(deps, info, &job, observations)? {
     resp = resp.add_message(house_msg);

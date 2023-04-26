@@ -264,27 +264,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw-multiflip"
-version = "0.0.1"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-acl",
- "cw-house-staking",
- "cw-lib",
- "cw-multi-test",
- "cw-storage-plus",
- "cw-utils",
- "cw2",
- "cw20",
- "cw_repository",
- "nois",
- "schemars",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "cw-storage-plus"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -468,6 +447,27 @@ name = "forward_ref"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8cbd1169bd7b4a0a20d92b9af7a7e0422888bd38a6f5ec29c1fd8c1558a272e"
+
+[[package]]
+name = "gelotto-multiflip"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-acl",
+ "cw-house-staking",
+ "cw-lib",
+ "cw-multi-test",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw20",
+ "cw_repository",
+ "nois",
+ "schemars",
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "generic-array"

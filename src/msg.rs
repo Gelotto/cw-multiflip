@@ -1,5 +1,6 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{to_binary, Addr, Coin, Storage, WasmMsg};
+use cw_lib::models::Owner;
 use nois::{NoisCallback, ProxyExecuteMsg};
 
 use crate::{
@@ -12,7 +13,9 @@ pub type ContractResult<T> = Result<T, ContractError>;
 
 #[cw_serde]
 pub struct InstantiateMsg {
-  pub nois_proxy_addr: Addr,
+  pub owner: Owner,
+  pub nois_proxy_addr: Option<Addr>,
+  pub use_nois: Option<bool>,
   pub house_addr: Addr,
   pub coins: Vec<FlippableCoin>,
 }
@@ -21,6 +24,7 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
   FlipCoins { flips: Vec<Flip> },
   ReceiveRandomness { callback: NoisCallback },
+  UseNois { value: bool },
 }
 
 #[cw_serde]
@@ -36,8 +40,9 @@ pub struct MigrateMsg {}
 
 #[cw_serde]
 pub struct SelectResponse {
-  pub owner: Option<Addr>,
+  pub owner: Option<Owner>,
   pub coins: Option<Vec<FlippableCoinView>>,
+  pub using_nois: Option<bool>,
 }
 
 pub fn build_get_next_randomness_msg(

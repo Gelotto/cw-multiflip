@@ -1,7 +1,7 @@
 use crate::{
   models::FlippableCoinView,
   msg::SelectResponse,
-  state::{COINS, OWNER},
+  state::{COINS, OWNER, USE_NOIS},
 };
 use cosmwasm_std::{Addr, Deps, Order, StdResult};
 use cw_repository::client::Repository;
@@ -14,6 +14,7 @@ pub fn select(
   let loader = Repository::loader(deps.storage, &maybe_fields);
   Ok(SelectResponse {
     owner: loader.get("owner", &OWNER)?,
+    using_nois: loader.get("use_nois", &USE_NOIS)?,
     coins: loader.view("coins", || {
       Ok(Some(
         COINS

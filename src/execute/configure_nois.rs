@@ -22,7 +22,7 @@ pub fn configure_nois(
   }
 
   Ok(Response::new().add_attributes(vec![
-      attr("action", "use_nois"),
+      attr("action", "configure_nois"),
       attr("enabled", enabled.to_string()),
       attr(
         "proxy_address",

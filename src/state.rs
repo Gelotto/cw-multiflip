@@ -49,7 +49,11 @@ pub fn initialize(
     )?,
   )?;
 
-  for (i, coin) in msg.coins.iter().enumerate() {
+  // only take up to 100 coins
+  let coins = msg.coins[..msg.coins.len().min(100)].to_vec();
+
+  COINS_LEN.save(deps.storage, &(coins.len() as u16))?;
+  for (i, coin) in coins.iter().enumerate() {
     validate_coin(coin)?;
     COINS.save(deps.storage, i as u16, &coin)?;
   }

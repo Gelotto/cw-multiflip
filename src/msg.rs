@@ -22,9 +22,19 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-  FlipCoins { flips: Vec<Flip> },
-  ReceiveRandomness { callback: NoisCallback },
-  UseNois { value: bool },
+  FlipCoins {
+    flips: Vec<Flip>,
+  },
+  ReceiveRandomness {
+    callback: NoisCallback,
+  },
+  ConfigureNois {
+    enabled: bool,
+    proxy_address: Option<Addr>,
+  },
+  SetOwner {
+    owner: Owner,
+  },
 }
 
 #[cw_serde]

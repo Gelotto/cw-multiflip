@@ -30,7 +30,11 @@ pub fn execute(
   msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
   match msg {
-    ExecuteMsg::UseNois { value } => execute::use_nois(deps, env, info, value),
+    ExecuteMsg::SetOwner { owner } => execute::set_owner(deps, env, info, owner),
+    ExecuteMsg::ConfigureNois {
+      enabled,
+      proxy_address,
+    } => execute::configure_nois(deps, env, info, enabled, proxy_address),
     ExecuteMsg::FlipCoins { flips } => execute::flip_coins(deps, env, info, &flips),
     ExecuteMsg::ReceiveRandomness { callback } => {
       execute::receive_randomness(deps, env, info, callback)

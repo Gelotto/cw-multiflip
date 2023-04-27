@@ -9,11 +9,11 @@ build:
 
 # deploy WASM file (generated from `make build`)
 deploy:
-	./bin/deploy ./artifacts/$(wasm_filename) $(network) $(sender) $(tag)
+	./bin/deploy ./artifacts/$(wasm_filename) $(network) $(sender) $(tag) $(acl)
 
 # instantiate last contract to be deployed using code ID in release dir code-id file
 instantiate:
-	./bin/instantiate $(network) $(sender) $(tag)
+	./bin/instantiate $(network) $(sender) $(tag) $(acl)
 
 # run all unit tests
 test:

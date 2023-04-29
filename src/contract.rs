@@ -1,10 +1,10 @@
 use crate::error::ContractError;
 use crate::execute;
-use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
+use crate::msg::{ContractResult, ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::query;
 use crate::state;
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response};
 use cw2::set_contract_version;
 
 const CONTRACT_NAME: &str = "crates.io:cw-multiflip";
@@ -47,9 +47,10 @@ pub fn query(
   deps: Deps,
   _env: Env,
   msg: QueryMsg,
-) -> StdResult<Binary> {
+) -> ContractResult<Binary> {
   let result = match msg {
     QueryMsg::Select { fields, wallet } => to_binary(&query::select(deps, fields, wallet)?),
+    QueryMsg::Job { job_id } => to_binary(&query::get_job(deps, job_id)?),
   }?;
   Ok(result)
 }

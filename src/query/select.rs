@@ -1,16 +1,16 @@
 use crate::{
   models::FlippableCoinView,
-  msg::SelectResponse,
+  msg::{ContractResult, SelectResponse},
   state::{COINS, OWNER, USE_NOIS},
 };
-use cosmwasm_std::{Addr, Deps, Order, StdResult};
+use cosmwasm_std::{Addr, Deps, Order};
 use cw_repository::client::Repository;
 
 pub fn select(
   deps: Deps,
   maybe_fields: Option<Vec<String>>,
   _wallet: Option<Addr>,
-) -> StdResult<SelectResponse> {
+) -> ContractResult<SelectResponse> {
   let loader = Repository::loader(deps.storage, &maybe_fields);
   Ok(SelectResponse {
     owner: loader.get("owner", &OWNER)?,

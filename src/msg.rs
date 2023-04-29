@@ -5,7 +5,7 @@ use nois::{NoisCallback, ProxyExecuteMsg};
 
 use crate::{
   error::ContractError,
-  models::{Flip, FlippableCoin, FlippableCoinView},
+  models::{Flip, FlipCoinsJob, FlippableCoin, FlippableCoinView},
   state::NOIS_PROXY_ADDR,
 };
 
@@ -43,6 +43,9 @@ pub enum QueryMsg {
     fields: Option<Vec<String>>,
     wallet: Option<Addr>,
   },
+  Job {
+    job_id: String,
+  },
 }
 
 #[cw_serde]
@@ -53,6 +56,11 @@ pub struct SelectResponse {
   pub owner: Option<Owner>,
   pub coins: Option<Vec<FlippableCoinView>>,
   pub using_nois: Option<bool>,
+}
+
+#[cw_serde]
+pub struct GetJobResponse {
+  pub job: Option<FlipCoinsJob>,
 }
 
 pub fn build_get_next_randomness_msg(

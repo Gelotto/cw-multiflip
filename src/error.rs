@@ -26,4 +26,10 @@ pub enum ContractError {
 
   #[error("InvalidCoinPrice")]
   InvalidCoinPrice {},
+
+  #[error("JobAlreadyProcessed")]
+  JobAlreadyProcessed,
+
+  #[error("CoinIndexOutOfBounds")]
+  CoinIndexOutOfBounds,
 }

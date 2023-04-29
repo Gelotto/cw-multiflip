@@ -16,8 +16,11 @@ pub fn flip_coins(
   info: MessageInfo,
   flips: &Vec<Flip>,
 ) -> ContractResult<Response> {
-  let mut resp = Response::new().add_attributes(vec![attr("action", "flip_coins")]);
-  let job = build_flip_coins_job(deps.storage, flips)?;
+  let mut job = build_flip_coins_job(deps.storage, flips)?;
+  let mut resp = Response::new().add_attributes(vec![
+    attr("action", "flip_coins"),
+    attr("job_id", job.job_id.clone()),
+  ]);
 
   if USE_NOIS.load(deps.storage)? {
     // Generate randomness asynchronously through IBC with Nois network.
@@ -43,8 +46,8 @@ pub fn flip_coins(
     // flips. Each observation is a value in the interval [0, 1000],
     // representing 0-100% in thousandths of a percent.
     let observations: Vec<u16> = {
-      let mut v: Vec<u16> = Vec::with_capacity(job.n_flips as usize);
-      for _ in 0..job.n_flips {
+      let mut v: Vec<u16> = Vec::with_capacity(job.total_n_flips as usize);
+      for _ in 0..job.total_n_flips {
         v.push((rng.next_u64() % 1000) as u16)
       }
       v
@@ -53,7 +56,7 @@ pub fn flip_coins(
     // assumed at this point that the house has been granted a GLTO spending
     // allowance on behalf of the player via the CW20 contract's set_allowance
     // function...
-    if let Some(house_msg) = execute_flip_coins(deps, info, &job, observations)? {
+    if let Some(house_msg) = execute_flip_coins(deps, info, &mut job, observations)? {
       resp = resp.add_message(house_msg);
     }
   }
@@ -67,11 +70,13 @@ fn build_flip_coins_job(
 ) -> ContractResult<FlipCoinsJob> {
   let job_id = get_next_job_id(storage)?;
   let (n_flips, total_price) = compute_totals(storage, flips)?;
+
   Ok(FlipCoinsJob {
     job_id: job_id.clone(),
     flips: flips.clone(),
     total_price,
-    n_flips,
+    total_n_flips: n_flips,
+    is_processed: false,
   })
 }
 
@@ -80,18 +85,21 @@ fn compute_totals(
   flips: &Vec<Flip>,
 ) -> ContractResult<(u32, Uint128)> {
   let n_coins = COINS_LEN.load(storage)?;
-  let mut n_flips_total: u32 = 0;
+  let mut total_n_flips: u32 = 0;
   let mut total_price = Uint128::zero();
+
   for flip in flips.iter() {
-    if flip.n_flips == 0 {
+    let n_flips = flip.n_flips_heads + flip.n_flips_tails;
+    if n_flips == 0 {
       return Err(ContractError::ZeroFlipCount {});
     }
     if flip.i_coin >= n_coins {
       return Err(ContractError::InvalidCoinOdds {});
     }
     let coin = COINS.load(storage, flip.i_coin)?;
-    n_flips_total += flip.n_flips as u32;
-    total_price = Uint128::from(flip.n_flips) * coin.price;
+    total_n_flips += n_flips as u32;
+    total_price = Uint128::from(n_flips) * coin.price;
   }
-  Ok((n_flips_total, total_price))
+
+  Ok((total_n_flips, total_price))
 }
